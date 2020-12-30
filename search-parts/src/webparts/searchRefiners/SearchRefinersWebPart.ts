@@ -41,6 +41,8 @@ import { UserService } from '../../services/UserService/UserService';
 import { MockUserService } from '../../services/UserService/MockUserService';
 import { initializeFileTypeIcons } from '@uifabric/file-type-icons';
 import PnPTelemetry from "@pnp/telemetry-js";
+import { PropertyFieldNumber } from '@pnp/spfx-property-controls/lib/PropertyFieldNumber';
+import { MAX_COLOR_VALUE } from 'office-ui-fabric-react';
 
 export default class SearchRefinersWebPart extends BaseClientSideWebPart<ISearchRefinersWebPartProps> implements IDynamicDataCallables {
 
@@ -107,6 +109,7 @@ export default class SearchRefinersWebPart extends BaseClientSideWebPart<ISearch
                         this.context.dynamicDataSourceManager.notifyPropertyChanged(SearchComponentType.RefinersWebPart);
                     },
                     selectedLayout: this.properties.selectedLayout,
+                    horizontalRefinerPerRow: this.properties.horizontalRefinerPerRow,
                     language: this.context.pageContext.cultureInfo.currentUICultureName,
                     query: queryKeywords + queryTemplate + selectedProperties + resultSourceId,
                     themeVariant: this._themeVariant,
@@ -279,6 +282,10 @@ export default class SearchRefinersWebPart extends BaseClientSideWebPart<ISearch
                             {
                                 key: RefinerTemplateOption.ContainerTree,
                                 text: strings.Refiners.Templates.ContainerTreeRefinementItemTemplateLabel
+                            },
+                            {
+                                key: RefinerTemplateOption.Dropdown,
+                                text: "Bluebox multi-value dropdown"
                             }
                         ]
                     },
@@ -361,7 +368,14 @@ export default class SearchRefinersWebPart extends BaseClientSideWebPart<ISearch
                 },
                 text: 'Panel',
                 key: RefinersLayoutOption.LinkAndPanel
-            }
+            },
+            {
+                iconProps: {
+                    officeFabricIconFontName: 'GripperBarHorizontal'
+                },
+                text: 'Horizontal',
+                key: RefinersLayoutOption.Horizontal,
+            },
         ] as IPropertyPaneChoiceGroupOption[];
 
         // Sets up styling fields
@@ -376,6 +390,13 @@ export default class SearchRefinersWebPart extends BaseClientSideWebPart<ISearch
             PropertyPaneChoiceGroup('selectedLayout', {
                 label: strings.RefinerLayoutLabel,
                 options: layoutOptions
+            }),
+            PropertyFieldNumber('horizontalRefinerPerRow', {
+                key: 'horizontalRefinerPerRow',
+                label: 'Number of refiners per row (Horizontal layout only) Max 5',
+                value: this.properties.horizontalRefinerPerRow,
+                maxValue: 5,
+                minValue: 1
             })
         ];
 

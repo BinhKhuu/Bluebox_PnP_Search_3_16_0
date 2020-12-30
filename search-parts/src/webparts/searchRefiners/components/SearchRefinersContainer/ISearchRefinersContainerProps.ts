@@ -65,4 +65,8 @@ export interface ISearchRefinersContainerProps {
    * The current theme variant
    */
   themeVariant: IReadonlyTheme | undefined;
+    /** 
+     * Width for each refiner item (Horizontal layout only)
+    */
+   horizontalRefinerPerRow?: number;
 }

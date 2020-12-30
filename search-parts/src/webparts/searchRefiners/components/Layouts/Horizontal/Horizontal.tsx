@@ -1,23 +1,24 @@
 import * as React from 'react';
 import IFilterLayoutProps from '../IFilterLayoutProps';
-import IVerticalState from './IVerticalState';
+import IHorizontalState from './IHorizontalSate';
 import * as update from 'immutability-helper';
 import {
     GroupedList,
+    GroupShowAll,
     IGroup,
     IGroupDividerProps,
     IGroupedList
 } from 'office-ui-fabric-react/lib/components/GroupedList/index';
 import { Link } from 'office-ui-fabric-react/lib/Link';
-import styles from './Vertical.module.scss';
+import styles from './Horizontal.module.scss';
 import * as strings from 'SearchRefinersWebPartStrings';
 import TemplateRenderer from '../../Templates/TemplateRenderer';
-import { isEqual } from '@microsoft/sp-lodash-subset';
+import { groupBy, isEqual } from '@microsoft/sp-lodash-subset';
 import { ITheme } from '@uifabric/styling';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import { Text as TextUI } from 'office-ui-fabric-react/lib/Text';
 
-export default class Vertical extends React.Component<IFilterLayoutProps, IVerticalState> {
+export default class Horizontal extends React.Component<IFilterLayoutProps, IHorizontalState> {
 
     private _groupedList: IGroupedList;
 
@@ -36,27 +37,12 @@ export default class Vertical extends React.Component<IFilterLayoutProps, IVerti
     }
 
     public render(): React.ReactElement<IFilterLayoutProps> {
-
-        let noResultsElement: JSX.Element;
-
-        const renderAvailableFilters = (this.props.refinementResults.length > 0) ? <GroupedList
-            ref='groupedList'
-            items={this.state.items}
-            componentRef={(g) => { this._groupedList = g; }}
-            onRenderCell={this._onRenderCell}
-            className={styles.verticalLayout__filterPanel__body__group}
-            onShouldVirtualize={() => false}
-            listProps={{ onShouldVirtualize: () => false }}
-            groupProps={
-                {
-                    onRenderHeader: this._onRenderHeader,
-
-                }
-            }
-            groups={this.state.groups} /> : noResultsElement;
+        //let noResultsElement: JSX.Element;
+        const refinerWidth = this.props.horizontalRefinerPerRow ? Math.floor(100 / this.props.horizontalRefinerPerRow) - 5 : 100;
+        var cssRefinerWidth = refinerWidth + '%';
 
         const renderLinkRemoveAll = this.props.hasSelectedValues ?
-            (<div className={`${styles.verticalLayout__filterPanel__body__removeAllFilters} ${this.props.hasSelectedValues && "hiddenLink"}`}>
+            (<div className={`${styles.horizontalLayout__filterPanel__body__removeAllFilters} ${this.props.hasSelectedValues && "hiddenLink"}`}>
                 <Link
                     theme={this.props.themeVariant as ITheme}
                     onClick={this._removeAllFilters}>
@@ -68,21 +54,109 @@ export default class Vertical extends React.Component<IFilterLayoutProps, IVerti
             <div style={{
                 height: '100%',
                 position: 'relative',
-                maxHeight: 'inherit'
             }}>
-                <div className={styles.verticalLayout__filterPanel__body} data-is-scrollable={true}>
-                    {this.state.nonGrouped.map((ng)=>{ 
-                        return ( 
-                            <div style={{margin: "5px"}}>
-                                <span className="bbRefinerTitle" style={{fontWeight:"bold"}}>{ng.name}</span>
-                                {this.state.items[ng.key]}
-                            </div>
-                            
-                            )
-                        })}
-                    {renderAvailableFilters}
-                    {renderLinkRemoveAll}
+                <div dangerouslySetInnerHTML={{__html:
+                    `<style> 
+                        .ms-List-surface .ms-List-page{background:white; position: relative;width: 100%;} 
+                        div[id*=GroupedListSection]{ 
+                            position:absolute; 
+                            width: 100%;
+                            box-sizing: border-box;
+                            box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 2px 0px;
+                            word-break: break-all;
+                        } 
+                        span[class^='css']{
+                            font-weight: bold;
+                            font-family: "Segoe UI Web (West European)",Segoe UI,-apple-system,BlinkMacSystemFont,Roboto,Helvetica Neue,sans-serif;
+                            font-size: 14px;
+                        }
+                    </style>`
+                    }}>
                 </div>
+
+                {
+                    this.state.items.map((item, index)=>{
+                        var itemHeader;
+                        var isNotGrouped = this.state.nonGrouped.some((ng)=>{
+                            if(item.key == ng.key){
+                                itemHeader = ng.name;
+                            }
+                            return item.key == ng.key;
+                        });
+                        var group = [];
+                        this.state.groups.some((g)=>{
+                            if(g.key == item.key){
+                                group.push(g)
+                            }
+                            return g.key == item.key;
+                        })
+                        return (
+                            !isNotGrouped ? 
+                            <div style={{display:"inline-block", width:cssRefinerWidth,verticalAlign:"top", margin:"5px"}}>
+                                <GroupedList
+                                    styles={{root:{width:"100%", zIndex:1000-index, fontWeight:"bold"}}}
+                                    ref='groupedList'
+                                    items={this.state.items}//need to operate on all items values wont show up if items is specific to group, might be bug with fabric ui
+                                    componentRef={(g) => { this._groupedList = g; }}
+                                    onRenderCell={this._onRenderCell}
+                                    className={styles.horizontalLayout__filterPanel__body__group}
+                                    onShouldVirtualize={() => false}
+                                    listProps={{ onShouldVirtualize: () => false }}
+                                    groupProps={
+                                        {
+                                            onRenderHeader: this._onRenderHeader,
+                                        }
+                                    }
+                                    groups={group} />
+                            </div> : 
+
+                            <div style={{margin: "5px",display:"inline-block",  width:cssRefinerWidth}}>
+                                <span className="bbRefinerTitle" style={{fontWeight:"bold"}}>{itemHeader}</span>
+                                {item}
+                            </div>
+                        )
+                    })
+                }
+                {/* Old rendering for dropdown, will render dropdown refiners first
+                    this.state.nonGrouped.map((ng)=>{ 
+                return ( 
+                    <div style={{margin: "5px",display:"inline-block", width:"30%"}}>
+                        <span className="bbRefinerTitle" style={{fontWeight:"bold"}}>{ng.name}</span>
+                        {this.state.items[ng.key]}
+                    </div>
+                    )
+                })*/}
+                {/*renderAvailableFilters*/
+                /*  Old group rendering will render after dropdown refiners
+
+                    this.state.groups.map((g,index)=>{
+                        var thisItem = this.state.items[index];
+                        var arr = [thisItem];
+                        var garr = [g];
+                    return (
+                        <div style={{display:"inline-block", width:"30%",verticalAlign:"top", margin:"5px"}}>
+                            <GroupedList
+                                styles={{root:{width:"100%", zIndex:1000-index}}}
+                                ref='groupedList'
+                                items={this.state.items}
+                                componentRef={(g) => { this._groupedList = g; }}
+                                onRenderCell={this._onRenderCell}
+                                className={styles.horizontalLayout__filterPanel__body__group}
+                                onShouldVirtualize={() => false}
+                                listProps={{ onShouldVirtualize: () => false }}
+                                groupProps={
+                                    {
+                                        onRenderHeader: this._onRenderHeader,
+
+                                    }
+                                }
+                                groups={garr} />
+                        </div>
+                    )
+                    })
+                */   
+                }
+                {renderLinkRemoveAll}
             </div>
         );
     }
@@ -104,12 +178,12 @@ export default class Vertical extends React.Component<IFilterLayoutProps, IVerti
         this._initItems(nextProps);
 
         // Need to force an update manually because nor items or groups update will be considered as an update by the GroupedList component.
-        this._groupedList.forceUpdate();
+        if(this._groupedList ) this._groupedList.forceUpdate();
     }
 
     private _onRenderCell(nestingDepth: number, item: any, itemIndex: number) {
         return (
-            <div className={styles.verticalLayout__filterPanel__body__group__item} data-selection-index={itemIndex}>
+            <div className={styles.horizontalLayout__filterPanel__body__group__item} data-selection-index={itemIndex}>
                 {item}
             </div>
         );
@@ -118,12 +192,12 @@ export default class Vertical extends React.Component<IFilterLayoutProps, IVerti
     private _onRenderHeader(props: IGroupDividerProps): JSX.Element {
 
         return (
-            <div className={styles.verticalLayout__filterPanel__body__group__header}
+            <div className={styles.horizontalLayout__filterPanel__body__group__header}
                 style={props.groupIndex > 0 ? { marginTop: '10px' } : undefined}
                 onClick={() => {
                     props.onToggleCollapse(props.group);
                 }}>
-                <div className={styles.verticalLayout__filterPanel__body__headerIcon}>
+                <div className={styles.horizontalLayout__filterPanel__body__headerIcon}>
                     {props.group.isCollapsed ?
                         <Icon iconName='ChevronDown' />
                         :
@@ -186,6 +260,8 @@ export default class Vertical extends React.Component<IFilterLayoutProps, IVerti
             
         });
 
+
+
         this.setState({
             groups: update(this.state.groups, { $set: groups }),
             nonGrouped: update(this.state.nonGrouped, {$set: nonGroup})
@@ -210,7 +286,6 @@ export default class Vertical extends React.Component<IFilterLayoutProps, IVerti
             // In this case we use the refiners global state to recreate the 'local' state for this component
             const selectedFilter = props.selectedFilters.filter(filter => { return filter.FilterName === refinementResult.FilterName; });
             const selectedFilterValues = selectedFilter.length === 1 ? selectedFilter[0].Values : [];
-
             items.push(
                 <TemplateRenderer
                     key={i}

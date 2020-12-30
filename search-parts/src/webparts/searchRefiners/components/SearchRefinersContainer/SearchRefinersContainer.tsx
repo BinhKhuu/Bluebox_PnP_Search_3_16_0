@@ -4,6 +4,7 @@ import { ISearchRefinersContainerProps } from './ISearchRefinersContainerProps';
 import { DisplayMode } from '@microsoft/sp-core-library';
 import { WebPartTitle } from "@pnp/spfx-controls-react/lib/WebPartTitle";
 import Vertical from '../Layouts/Vertical/Vertical';
+import Horizontal from '../Layouts/Horizontal/Horizontal';
 import LinkPanel from '../Layouts/LinkPanel/LinkPanel';
 import RefinersLayoutOption from '../../../../models/RefinersLayoutOptions';
 import { MessageBarType, MessageBar } from 'office-ui-fabric-react/lib/MessageBar';
@@ -92,7 +93,23 @@ export default class SearchRefinersContainer extends React.Component<ISearchRefi
                         selectedFilters={this.state.selectedRefinementFilters}
                         userService={this.props.userService}
                     />;
-                    break;
+                    break;                    
+		case RefinersLayoutOption.Horizontal:
+                        renderWpContent = <Horizontal
+                            onFilterValuesUpdated={this.onFilterValuesUpdated}
+                            refinementResults={this.state.availableRefiners}
+                            refinersConfiguration={this.props.refinersConfiguration}
+                            shouldResetFilters={this.state.shouldResetFilters}
+                            onRemoveAllFilters={this.onRemoveAllFilters}
+                            hasSelectedValues={this.state.selectedRefinementFilters.length > 0 ? true : false}
+                            language={this.props.language}
+                            themeVariant={this.props.themeVariant}
+                            horizontalRefinerPerRow={this.props.horizontalRefinerPerRow}
+                            selectedFilters={this.state.selectedRefinementFilters}
+                            userService={this.props.userService}
+                        />;
+                        break;
+
             }
         }
 
