@@ -74,13 +74,13 @@ export default class SearchRefinersWebPart extends BaseClientSideWebPart<ISearch
         let queryTemplate: string = '';
         let resultSourceId: string = '';
         let defaultSelectedFilters: IRefinementFilter[] = [];
-
+        
         if (this.properties.searchResultsDataSourceReference) {
-
+            
             // If the dynamic property exists, it means the Web Part ins connected to a search results Web Part
             if (this._searchResultSourceData) {
                 const searchResultSourceData: ISearchResultSourceData = this._searchResultSourceData.tryGetValue();
-
+                
                 if (searchResultSourceData) {
                     availableRefiners = searchResultSourceData.refinementResults;
                     queryKeywords = searchResultSourceData.queryKeywords;

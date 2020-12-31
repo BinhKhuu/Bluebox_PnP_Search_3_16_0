@@ -84,7 +84,6 @@ export default class TemplateRenderer extends React.Component<ITemplateRendererP
       const nonEmptyValues = this.props.selectedValues.filter(s => s.RefinementCount > 0);
       selectedValues = nonEmptyValues.length > 0 ? [nonEmptyValues[0]] : [];
     }
-
     // Choose the right template according to the template type
     switch (this.props.templateType) {
       case RefinerTemplateOption.CheckBox:
@@ -204,7 +203,7 @@ export default class TemplateRenderer extends React.Component<ITemplateRendererP
             isMultiValue={true}
             themeVariant={this.props.themeVariant}
             removeFilterValue={this.props.valueToRemove}
-            selectedValues={this.props.selectedValues} 
+            selectedValues={selectedValues} 
             showValueFilter={this.props.showValueFilter}
           />;
           break;

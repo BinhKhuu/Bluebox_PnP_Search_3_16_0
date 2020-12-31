@@ -20,13 +20,13 @@ export default class DropdownTemplate extends React.Component<IBaseRefinerTempla
     
     public constructor(props: IBaseRefinerTemplateProps) {
         super(props);
-       
         this.state = {
             refinerSelectedFilterValues: [],
-            selectedItems: this.props.selectedValues
+            selectedItems: this.props.selectedValues.map((selectedVal,index)=>{
+                return selectedVal.RefinementToken
+            })
         
         };
-
         this._onFilterAdded = this._onFilterAdded.bind(this);
         this._onFilterRemoved = this._onFilterRemoved.bind(this);
         this._applyFilters = this._applyFilters.bind(this);
@@ -37,7 +37,6 @@ export default class DropdownTemplate extends React.Component<IBaseRefinerTempla
     }
 
     public render() {
-
         let disableButtons = false;
 
         if ((this.props.selectedValues.length === 0 && this.state.refinerSelectedFilterValues.length === 0)) {

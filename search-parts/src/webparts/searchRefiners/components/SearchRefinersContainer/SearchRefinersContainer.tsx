@@ -22,7 +22,6 @@ export default class SearchRefinersContainer extends React.Component<ISearchRefi
 
     public constructor(props: ISearchRefinersContainerProps) {
         super(props);
-
         this.state = {
             shouldResetFilters: false,
             selectedRefinementFilters: [],
