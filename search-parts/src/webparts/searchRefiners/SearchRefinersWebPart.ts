@@ -94,7 +94,6 @@ export default class SearchRefinersWebPart extends BaseClientSideWebPart<ISearch
                     }
                 }
             }
-
             renderElement = React.createElement(
                 SearchRefinersContainer,
                 {

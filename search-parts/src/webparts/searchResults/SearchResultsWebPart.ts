@@ -212,7 +212,6 @@ export default class SearchResultsWebPart extends BaseClientSideWebPart<ISearchR
             this.firstLoad = false;
         }
         selectedFilters = this.defaultSelectedFilters;
-
         let queryDataSourceValue = this.properties.queryKeywords.tryGetValue();
 
         let queryKeywords = this.properties.defaultSearchQuery;

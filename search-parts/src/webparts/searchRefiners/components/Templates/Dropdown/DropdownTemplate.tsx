@@ -25,7 +25,6 @@ export default class DropdownTemplate extends React.Component<IBaseRefinerTempla
             selectedItems: this.props.selectedValues.map((selectedVal,index)=>{
                 return selectedVal.RefinementToken
             })
-        
         };
         this._onFilterAdded = this._onFilterAdded.bind(this);
         this._onFilterRemoved = this._onFilterRemoved.bind(this);
