@@ -1,7 +1,7 @@
 enum RefinersLayoutOption {
-    Horizontal,
     Vertical,
-    LinkAndPanel
+    LinkAndPanel,
+    Horizontal
 }
 
 export default RefinersLayoutOption;
