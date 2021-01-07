@@ -10,10 +10,12 @@ import { Link } from 'office-ui-fabric-react/lib/Link';
 import * as update from 'immutability-helper';
 import { ITheme, noWrap } from "@uifabric/styling";
 import { selectProperties, TextField } from "office-ui-fabric-react";
+import { SelectedFiltersLabel } from "SearchResultsWebPartStrings";
 
 //CSS
 //import styles from './CheckboxTemplate.module.scss';
-
+//!! Dropdown rendering will not be rendered with the Grouped lists styleing (template values 10 and 11) in Vertical and Horizontal layouts 
+//!! this means the group list styling (heading with drop down) is not warpping the drown down button (no double drop down)
 export default class DropdownTemplate extends React.Component<IBaseRefinerTemplateProps, IDropdownRefinerTemplateState> {
 
     private _operator: RefinementOperator;
@@ -51,15 +53,15 @@ export default class DropdownTemplate extends React.Component<IBaseRefinerTempla
         })
 
         return <div className={"bbDropdownRefiner"}>
-            {     
+            {   
+                this.props.isMultiValue ?
                 <div>
                     <Dropdown
                         style={{}}
                         styles={{dropdownOptionText:{whiteSpace:"hidden",fontSize:"14px"}}}
                         options={ddOptions}
-                        //selectedKey={this.state.selectedItems}
-                        multiSelect={true}
-                        selectedKeys={this.state.selectedItems}
+                        multiSelect={this.props.isMultiValue}
+                        selectedKeys={this.props.isMultiValue? this.state.selectedItems : this.props.selectedValues}
                         onChange={(ev, option) => {
                             if(option.selected){
                                 var refinementValue = this.props.refinementResult.Values.filter((val)=>{
@@ -81,21 +83,53 @@ export default class DropdownTemplate extends React.Component<IBaseRefinerTempla
                         }} 
                     >
                     </Dropdown>
-                </div>
-
-            }
-            {
-                this.props.isMultiValue ?
-
-                    <div>
                         <Link
                             theme={this.props.themeVariant as ITheme}
                             onClick={() => { this._applyFilters(this.state.refinerSelectedFilterValues); }}
                             disabled={disableButtons}>{"Apply filters"}
-                        </Link>{'\u00A0'}|{'\u00A0'}<Link theme={this.props.themeVariant as ITheme}  onClick={this._clearFilters} disabled={this.state.refinerSelectedFilterValues.length === 0}>{"Clear filters"}</Link>
+                        </Link>{'\u00A0'}|{'\u00A0'}
+                        <Link 
+                            theme={this.props.themeVariant as ITheme}  
+                            onClick={this._clearFilters} disabled={this.state.refinerSelectedFilterValues.length === 0}
+                        >
+                            {"Clear filters"}
+                        </Link>
                     </div>
-
-                    : null 
+                    :
+                <div>
+                    <Dropdown
+                        style={{}}
+                        styles={{dropdownOptionText:{whiteSpace:"hidden",fontSize:"14px"}}}
+                        options={ddOptions}
+                        selectedKey={this.state.selectedItems? this.state.selectedItems[0] : null}
+                        multiSelect={this.props.isMultiValue}
+                        onChange={(ev, option) => {
+                            //dropdown will select first option if focus event is not handled
+                            let selected = ev.type === 'focus' || option.key == this.state.selectedItems[0] ?
+                                [null] : [option.key]
+                            
+                            this.setState({selectedItems: selected},()=>{
+                                var refinementValue = this.props.refinementResult.Values.filter((val)=>{
+                                    if(val.RefinementToken == option.key) return true;
+                                });
+                                if(this.state.selectedItems[0] !== null){
+                                    this._applyFilters(refinementValue);
+                                }
+                                else if(ev.type !== 'focus') {
+                                    
+                                    this._clearFilters();
+                                }   
+                            });
+                        }} 
+                    >
+                    </Dropdown>
+                    <Link 
+                        theme={this.props.themeVariant as ITheme}  
+                        onClick={this._clearFilters} disabled={this.state.selectedItems[0] == null}
+                    >
+                        {"Clear filters"}
+                    </Link>
+                </div>
             }
         </div>;
     }
@@ -116,7 +150,7 @@ export default class DropdownTemplate extends React.Component<IBaseRefinerTempla
         if (nextProps.shouldResetFilters) {
             this.setState({
                 refinerSelectedFilterValues: [],
-                selectedItems:[]
+                selectedItems:[null]
             });
         }
 
@@ -210,7 +244,7 @@ export default class DropdownTemplate extends React.Component<IBaseRefinerTempla
 
         this.setState({
             refinerSelectedFilterValues: [],
-            selectedItems:[]
+            selectedItems:[null]
         });
 
         this._applyFilters([]);

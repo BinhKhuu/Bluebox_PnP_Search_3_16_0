@@ -8,7 +8,8 @@ enum RefinerTemplateOption {
     FileType = 7,
     FileTypeMulti = 8,
     ContainerTree = 9,
-    Dropdown = 10
+    Dropdown = 10,
+    DropdownMulti = 11,
 }
 
 export default RefinerTemplateOption;

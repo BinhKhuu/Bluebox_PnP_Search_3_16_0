@@ -284,6 +284,10 @@ export default class SearchRefinersWebPart extends BaseClientSideWebPart<ISearch
                             },
                             {
                                 key: RefinerTemplateOption.Dropdown,
+                                text: "Bluebox single-value dropdown"
+                            },
+                            {
+                                key: RefinerTemplateOption.DropdownMulti,
                                 text: "Bluebox multi-value dropdown"
                             }
                         ]

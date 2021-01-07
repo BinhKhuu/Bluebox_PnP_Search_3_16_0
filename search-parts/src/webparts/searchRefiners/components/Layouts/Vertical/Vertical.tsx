@@ -179,7 +179,7 @@ export default class Vertical extends React.Component<IFilterLayoutProps, IVerti
 
             refinementconfig.filter((config)=>{
                 if(config.refinerName == refinementResult.FilterName){
-                    if(config.template == 10) nonGroup.push(group)
+                    if(config.template == 10 || config.template == 11) nonGroup.push(group);
                     else groups.push(group);
                 }
             })

@@ -200,6 +200,19 @@ export default class TemplateRenderer extends React.Component<ITemplateRendererP
             refinementResult={this.props.refinementResult}
             onFilterValuesUpdated={this.props.onFilterValuesUpdated}
             shouldResetFilters={this.props.shouldResetFilters}
+            isMultiValue={false}
+            themeVariant={this.props.themeVariant}
+            removeFilterValue={this.props.valueToRemove}
+            selectedValues={selectedValues} 
+            showValueFilter={this.props.showValueFilter}
+          />;
+          break;
+
+        case RefinerTemplateOption.DropdownMulti:
+            renderTemplate= <DropdownTemplate         
+            refinementResult={this.props.refinementResult}
+            onFilterValuesUpdated={this.props.onFilterValuesUpdated}
+            shouldResetFilters={this.props.shouldResetFilters}
             isMultiValue={true}
             themeVariant={this.props.themeVariant}
             removeFilterValue={this.props.valueToRemove}
